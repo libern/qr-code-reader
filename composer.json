@@ -1,6 +1,6 @@
 {
   "name": "libern/qr-code-reader",
-  "description": "Simple PHP QR Code Reader/Decoder",
+  "description": "Simple PHP QR Code Reader / Decoder",
   "keywords": [
     "laravel",
     "qr code reader",
