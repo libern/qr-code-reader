@@ -23,6 +23,5 @@
     "psr-4": {
       "Libern\\QRCodeReader\\": "src/"
     }
-  },
-  "prefer-stable": true
+  }
 }
