@@ -1,5 +1,7 @@
 <?php namespace Libern\QRCodeReader;
 
+use Libern\QRCodeReader\lib\QrReader;
+
 /**
  * Created for QRCodeReader.
  * User: Libern
@@ -15,7 +17,6 @@ class QRCodeReader
      */
     public static function decode($path_to_image)
     {
-        include_once(__DIR__ . '/lib/QrReader.php');
         $qrcode = new QrReader($path_to_image);
         $text = $qrcode->text();
         return $text;
