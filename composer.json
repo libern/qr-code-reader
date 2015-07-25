@@ -4,7 +4,7 @@
   "keywords": [
     "laravel",
     "qr code reader",
-    "qr code decoder",
+    "qr code decoder"
   ],
   "homepage": "https://github.com/libern/qr-code-reader",
   "type": "library",
