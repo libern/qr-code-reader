@@ -56,7 +56,7 @@ final class QrReader
         try {
 
             if(extension_loaded('imagick')) {
-                $im = new Imagick();
+                $im = new \Imagick();
                 $im->readImage($filename);
                 $width = $im->getImageWidth();
                 $height = $im->getImageHeight();
