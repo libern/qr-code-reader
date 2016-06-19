@@ -1,4 +1,9 @@
 # PHP QR Code Reader / Decoder
+
+[![Latest Version](https://img.shields.io/github/release/libern/qr-code-reader.svg?style=flat-square)](https://github.com/libern/qr-code-reader/releases)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![Total Downloads](https://img.shields.io/packagist/dt/libern/qr-code-reader.svg?style=flat-square)](https://packagist.org/packages/libern/qr-code-reader)
+
 This is a PHP library to detect and decode QR-codes. <br>
 This is QR code reader that works without extensions. <br>
 This library supports PSR-4. <br>
