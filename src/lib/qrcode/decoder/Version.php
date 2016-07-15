@@ -19,6 +19,7 @@ namespace Zxing\Qrcode\Decoder;
 
 use Zxing\FormatException;
 use Zxing\Common\BitMatrix;
+use \InvalidArgumentException;
 
 /**
  * See ISO 18004:2006 Annex D
