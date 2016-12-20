@@ -58,7 +58,7 @@ final class QrReader
 
             if ($this->isBase64($filename)) {
                 $imageStream = base64_decode($filename);
-                $finfo = new finfo(FILEINFO_NONE);
+                $finfo = new \finfo(FILEINFO_NONE);
                 $imageDetails = explode(',', $finfo->buffer($imageStream));
                 $imageSize = explode('x', str_replace(' ', '', $imageDetails[1]));
                 $im = imagecreatefromstring($imageStream);
