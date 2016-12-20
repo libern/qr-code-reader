@@ -55,21 +55,32 @@ final class QrReader
 
         try {
 
-            if(extension_loaded('imagick')) {
-                $im = new \Imagick();
-                $im->readImage($filename);
-                $width = $im->getImageWidth();
-                $height = $im->getImageHeight();
-                $source = new \Zxing\IMagickLuminanceSource($im, $width, $height);
-            }else {
-                $image = file_get_contents($filename);
-                $sizes = getimagesize($filename);
-                $width = $sizes[0];
-                $height = $sizes[1];
-                $im = imagecreatefromstring($image);
 
-                $source = new \Zxing\GDLuminanceSource($im, $width, $height);
+            if ($this->isBase64($filename)) {
+                $imageStream = base64_decode($filename);
+                $finfo = new finfo(FILEINFO_NONE);
+                $imageDetails = explode(',', $finfo->buffer($imageStream));
+                $imageSize = explode('x', str_replace(' ', '', $imageDetails[1]));
+                $im = imagecreatefromstring($imageStream);
+                $source = new \Zxing\GDLuminanceSource($im, $imageSize[0], $imageSize[1]);
+            } else {
+                if(extension_loaded('imagick')) {
+                    $im = new \Imagick();
+                    $im->readImage($filename);
+                    $width = $im->getImageWidth();
+                    $height = $im->getImageHeight();
+                    $source = new \Zxing\IMagickLuminanceSource($im, $width, $height);
+                }else {
+                    $image = file_get_contents($filename);
+                    $sizes = getimagesize($filename);
+                    $width = $sizes[0];
+                    $height = $sizes[1];
+                    $im = imagecreatefromstring($image);
+
+                    $source = new \Zxing\GDLuminanceSource($im, $width, $height);
+                }
             }
+
             $histo = new \Zxing\Common\HybridBinarizer($source);
             $bitmap = new \Zxing\BinaryBitmap($histo);
             $reader = new \Zxing\Qrcode\QRCodeReader();
@@ -93,5 +104,13 @@ final class QrReader
         }
     }
 
+    /**
+     * Get is valid base64 string
+     * @param $string
+     * @return bool
+     */
+    private function isBase64 ($string) {
+        return preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $string);
+    }
 }
 
