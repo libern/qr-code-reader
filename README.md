@@ -17,9 +17,16 @@ composer require libern/qr-code-reader
 ```
 
 ## Usage 
+From image url
 ```php
 $QRCodeReader = new Libern\QRCodeReader\QRCodeReader();
 $qrcode_text = $QRCodeReader->decode("path_to_qr_code");
+echo $qrcode_text;
+```
+From image stream
+```php
+$QRCodeReader = new Libern\QRCodeReader\QRCodeReader();
+$qrcode_text = $QRCodeReader->decode(base64_encode("image_stream"));
 echo $qrcode_text;
 ```
 
