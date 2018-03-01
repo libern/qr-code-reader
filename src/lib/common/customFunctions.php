@@ -85,10 +85,12 @@ function floatToIntBits($float_val)
     return $int[1];
 }
 
-function fill_array($index,$count,$value){
-    if($count<=0){
-        return array(0);
-    }else {
-        return array_fill($index, $count, $value);
+if (!function_exists('fill_array')) {
+    function fill_array($index,$count,$value){
+        if($count<=0){
+            return array(0);
+        }else {
+            return array_fill($index, $count, $value);
+        }
     }
 }
