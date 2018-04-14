@@ -1,5 +1,5 @@
 <?php
-if (!function_exists('arraycopy') {
+if (!function_exists('arraycopy')) {
     function arraycopy($srcArray,$srcPos,$destArray, $destPos, $length){//System.arraycopy
         $srcArrayToCopy = array_slice($srcArray,$srcPos,$length);
         array_splice($destArray,$destPos,$length,$srcArrayToCopy);
@@ -7,13 +7,13 @@ if (!function_exists('arraycopy') {
     }
 }
 
-if (!function_exists('overflow32') {
+if (!function_exists('overflow32')) {
     function overflow32($value) {//There is no need to overflow 64 bits to 32 bit
         return $value;
     }
 }
 
-if (!function_exists('hashCode') {
+if (!function_exists('hashCode')) {
     function hashCode( $s )
     {
         $h = 0;
@@ -27,7 +27,7 @@ if (!function_exists('hashCode') {
     }
 }
 
-if (!function_exists('numberOfTrailingZeros') {
+if (!function_exists('numberOfTrailingZeros')) {
     function numberOfTrailingZeros($i) {
         if ($i == 0) return 32;
         $num = 0;
@@ -39,7 +39,7 @@ if (!function_exists('numberOfTrailingZeros') {
     }
 }
 
-if (!function_exists('intval32bitc') {
+if (!function_exists('intval32bitc')) {
     function intval32bits($value)
     {
 
@@ -52,7 +52,7 @@ if (!function_exists('intval32bitc') {
     }
 }
 
-if (!function_exists('uRSHift') {
+if (!function_exists('uRSHift')) {
     function uRShift($a, $b)
     {
         if($b == 0) return $a;
@@ -73,7 +73,7 @@ function sdvig3($num,$count=1){//>>> 32 bit
     return bindec(implode($sarray));
 }
 */
-if (!function_exists('sdvig3') {
+if (!function_exists('sdvig3')) {
     function sdvig3($a,$b) {
         return $a>>$b;
         if ($a >= 0) {
@@ -89,7 +89,7 @@ if (!function_exists('sdvig3') {
     }
 }
 
-if (!function_exists('floatToIntBits') {
+if (!function_exists('floatToIntBits')) {
     function floatToIntBits($float_val)
     {
         $int = unpack('i', pack('f', $float_val));
