@@ -23,6 +23,9 @@
     "psr-4": {
       "Libern\\QRCodeReader\\": "src/",
       "Zxing\\": "src/lib/"
-    }
+    },
+    "files": [
+      "src/lib/Common/customFunctions.php"
+    ]
   }
 }
