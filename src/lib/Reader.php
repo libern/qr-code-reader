@@ -2,14 +2,9 @@
 
 namespace Zxing;
 
-require_once('qrcode/QRCodeReader.php');
+interface Reader
+{
+    public function decode(BinaryBitmap $image);
 
-interface Reader {
-
-    public function decode($image);
-
-
-    public  function reset();
-
-
+    public function reset();
 }

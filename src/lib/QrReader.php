@@ -1,117 +1,105 @@
-<?php namespace Libern\QRCodeReader\lib;
+<?php
 
-include_once('Reader.php');
-require_once('BinaryBitmap.php');
-require_once('common/detector/MathUtils.php');
-require_once('common/BitMatrix.php');
-require_once('common/BitSource.php');
-require_once('common/BitArray.php');
-require_once('BinaryBitmap.php');
-include_once('LuminanceSource.php');
-include_once('GDLuminanceSource.php');
-include_once('IMagickLuminanceSource.php');
-include_once('common/customFunctions.php');
-include_once('common/PerspectiveTransform.php');
-include_once('common/GridSampler.php');
-include_once('common/DefaultGridSampler.php');
-include_once('common/DetectorResult.php');
-require_once('common/reedsolomon/GenericGFPoly.php');
-require_once('common/reedsolomon/GenericGF.php');
-include_once('common/reedsolomon/ReedSolomonDecoder.php');
-include_once('common/reedsolomon/ReedSolomonException.php');
+namespace Zxing;
 
-include_once('qrcode/decoder/Decoder.php');
-include_once('ReaderException.php');
-include_once('NotFoundException.php');
-include_once('FormatException.php');
-include_once('ChecksumException.php');
-include_once('qrcode/detector/FinderPatternInfo.php');
-include_once('qrcode/detector/FinderPatternFinder.php');
-include_once('ResultPoint.php');
-include_once('qrcode/detector/FinderPattern.php');
-include_once('qrcode/detector/AlignmentPatternFinder.php');
-include_once('qrcode/detector/AlignmentPattern.php');
-include_once('qrcode/decoder/Version.php');
-include_once('qrcode/decoder/BitMatrixParser.php');
-include_once('qrcode/decoder/FormatInformation.php');
-include_once('qrcode/decoder/ErrorCorrectionLevel.php');
-include_once('qrcode/decoder/DataMask.php');
-include_once('qrcode/decoder/DataBlock.php');
-include_once('qrcode/decoder/DecodedBitStreamParser.php');
-include_once('qrcode/decoder/Mode.php');
-include_once('common/DecoderResult.php');
-include_once('Result.php');
-include_once('Binarizer.php');
-include_once('common/GlobalHistogramBinarizer.php');
-include_once('common/HybridBinarizer.php');
-
+use Zxing\Common\HybridBinarizer;
+use Zxing\Qrcode\QRCodeReader;
 
 final class QrReader
 {
-    public $result;
+    const SOURCE_TYPE_FILE     = 'file';
+    const SOURCE_TYPE_BLOB     = 'blob';
+    const SOURCE_TYPE_RESOURCE = 'resource';
 
-    function __construct($filename)
+    private $bitmap;
+    private $reader;
+    private $result;
+
+    public function __construct($imgSource, $sourceType = QrReader::SOURCE_TYPE_FILE, $useImagickIfAvailable = true)
     {
-
-        try {
-
-
-            if ($this->isBase64($filename)) {
-                $imageStream = base64_decode($filename);
-                $finfo = new \finfo(FILEINFO_NONE);
-                $imageDetails = explode(',', $finfo->buffer($imageStream));
-                $imageSize = explode('x', str_replace(' ', '', $imageDetails[1]));
-                $im = imagecreatefromstring($imageStream);
-                $source = new \Zxing\GDLuminanceSource($im, $imageSize[0], $imageSize[1]);
-            } else {
-                if (extension_loaded('imagick')) {
+        if (!in_array($sourceType, [
+            self::SOURCE_TYPE_FILE,
+            self::SOURCE_TYPE_BLOB,
+            self::SOURCE_TYPE_RESOURCE,
+        ], true)) {
+            throw new \InvalidArgumentException('Invalid image source.');
+        }
+        $im = null;
+        switch ($sourceType) {
+            case QrReader::SOURCE_TYPE_FILE:
+                if ($useImagickIfAvailable && extension_loaded('imagick')) {
                     $im = new \Imagick();
-                    $im->readImage($filename);
-                    $width = $im->getImageWidth();
-                    $height = $im->getImageHeight();
-                    $source = new \Zxing\IMagickLuminanceSource($im, $width, $height);
+                    $im->readImage($imgSource);
                 } else {
-                    $image = file_get_contents($filename);
-                    $sizes = getimagesize($filename);
-                    $width = $sizes[0];
-                    $height = $sizes[1];
-                    $im = imagecreatefromstring($image);
-
-                    $source = new \Zxing\GDLuminanceSource($im, $width, $height);
+                    $image = file_get_contents($imgSource);
+                    $im    = imagecreatefromstring($image);
                 }
+                break;
+
+            case QrReader::SOURCE_TYPE_BLOB:
+                if ($useImagickIfAvailable && extension_loaded('imagick')) {
+                    $im = new \Imagick();
+                    $im->readImageBlob($imgSource);
+                } else {
+                    $im = imagecreatefromstring($imgSource);
+                }
+                break;
+
+            case QrReader::SOURCE_TYPE_RESOURCE:
+                $im = $imgSource;
+                if ($useImagickIfAvailable && extension_loaded('imagick')) {
+                    $useImagickIfAvailable = true;
+                } else {
+                    $useImagickIfAvailable = false;
+                }
+                break;
+        }
+        if ($useImagickIfAvailable && extension_loaded('imagick')) {
+            if (!$im instanceof \Imagick) {
+                throw new \InvalidArgumentException('Invalid image source.');
             }
+            $width  = $im->getImageWidth();
+            $height = $im->getImageHeight();
+            $source = new IMagickLuminanceSource($im, $width, $height);
+        } else {
+            if (!is_resource($im)) {
+                throw new \InvalidArgumentException('Invalid image source.');
+            }
+            $width  = imagesx($im);
+            $height = imagesy($im);
+            $source = new GDLuminanceSource($im, $width, $height);
+        }
+        $histo        = new HybridBinarizer($source);
+        $this->bitmap = new BinaryBitmap($histo);
+        $this->reader = new QRCodeReader();
+    }
 
-            $histo = new \Zxing\Common\HybridBinarizer($source);
-            $bitmap = new \Zxing\BinaryBitmap($histo);
-            $reader = new \Zxing\Qrcode\QRCodeReader();
-
-            $this->result = $reader->decode($bitmap);
-        } catch (\Zxing\NotFoundException $er) {
+    public function decode()
+    {
+        try {
+            $this->result = $this->reader->decode($this->bitmap);
+        } catch (NotFoundException $er) {
             $this->result = false;
-        } catch (\Zxing\FormatException $er) {
+        } catch (FormatException $er) {
             $this->result = false;
-        } catch (\Zxing\ChecksumException $er) {
+        } catch (ChecksumException $er) {
             $this->result = false;
         }
     }
 
     public function text()
     {
+        $this->decode();
+
         if (method_exists($this->result, 'toString')) {
-            return ($this->result->toString());
-        } else {
-            return $this->result;
+            return $this->result->toString();
         }
+
+        return $this->result;
     }
 
-    /**
-     * Get is valid base64 string
-     * @param $string
-     * @return bool
-     */
-    private function isBase64($string)
+    public function getResult()
     {
-        return (bool)preg_match('/^[a-zA-Z0-9\r\n+]*={0,2}$/', $string);
+        return $this->result;
     }
 }
-

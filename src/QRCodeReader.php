@@ -1,6 +1,7 @@
 <?php namespace Libern\QRCodeReader;
 
-use Libern\QRCodeReader\lib\QrReader;
+
+use Zxing\QrReader;
 
 /**
  * Created for QRCodeReader.

@@ -19,7 +19,6 @@ namespace Zxing\Qrcode\Decoder;
 
 use Zxing\FormatException;
 use Zxing\Common\BitMatrix;
-use \InvalidArgumentException;
 
 /**
  * See ISO 18004:2006 Annex D
@@ -111,7 +110,7 @@ class Version
         }
         try {
             return self::getVersionForNumber(($dimension - 17) / 4);
-        } catch (InvalidArgumentException $ignored) {
+        } catch (\InvalidArgumentException $ignored) {
             throw FormatException::getFormatInstance();
         }
     }
@@ -119,7 +118,7 @@ class Version
     public  static function getVersionForNumber($versionNumber)
     {
         if ($versionNumber < 1 || $versionNumber > 40) {
-            throw new InvalidArgumentException();
+            throw new \InvalidArgumentException();
         }
         if(!self::$VERSIONS){
 
