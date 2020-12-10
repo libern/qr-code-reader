@@ -25,7 +25,7 @@
       "Zxing\\": "src/lib/"
     },
     "files": [
-      "src/lib/Common/customFunctions.php"
+      "src/lib/common/customFunctions.php"
     ]
   }
 }
